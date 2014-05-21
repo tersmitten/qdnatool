@@ -68,10 +68,10 @@ class QuestionsController extends AppController {
 	public function add($tagId = null) {
 		if ($this->request->is('post')) {
 			if ($this->Question->add($this->request->data)) {
-				$this->Session->setFlash(__('The question has been saved'), 'alert', array('plugin' => 'TwitterBootstrap', 'class' => 'alert-success'));
+				$this->setFlashSuccess(__('The question has been saved'));
 				return $this->redirect(array('action' => 'view', $this->Question->id));
 			} else {
-				$this->Session->setFlash(__('The question could not be saved. Please, try again.'), 'alert', array('plugin' => 'TwitterBootstrap', 'class' => 'alert-error'));
+				$this->setFlashError(__('The question could not be saved. Please, try again.'));
 			}
 		} else {
 			if (!empty($tagId)) {
@@ -110,10 +110,10 @@ class QuestionsController extends AppController {
 		}
 		if ($this->request->is('post') || $this->request->is('put')) {
 			if ($this->Question->update($this->request->data)) {
-				$this->Session->setFlash(__('The question has been saved'), 'alert', array('plugin' => 'TwitterBootstrap', 'class' => 'alert-success'));
+				$this->setFlashSuccess(__('The question has been saved'));
 				return $this->redirect(array('action' => 'view', $id));
 			} else {
-				$this->Session->setFlash(__('The question could not be saved. Please, try again.'), 'alert', array('plugin' => 'TwitterBootstrap', 'class' => 'alert-error'));
+				$this->setFlashError(__('The question could not be saved. Please, try again.'));
 			}
 		} else {
 			$this->request->data = $this->Question->edit($id);
@@ -151,14 +151,14 @@ class QuestionsController extends AppController {
 			throw new NotFoundException(__('Invalid question'));
 		}
 		if ($this->Question->delete($id)) {
-			$this->Session->setFlash(__('Question deleted'), 'alert', array('plugin' => 'TwitterBootstrap', 'class' => 'alert-success'));
+			$this->setFlashSuccess(__('Question deleted'));
 			$referer = $this->Session->read('_App.referer');
 			if (empty($referer)) {
 				$referer = array('action' => 'index');
 			}
 			return $this->redirect($referer);
 		}
-		$this->Session->setFlash(__('Question was not deleted'), 'alert', array('plugin' => 'TwitterBootstrap', 'class' => 'alert-error'));
+		$this->setFlashError(__('Question was not deleted'));
 		$referer = $this->Session->read('_App.referer');
 		if (empty($referer)) {
 			$referer = array('action' => 'index');
@@ -189,9 +189,9 @@ class QuestionsController extends AppController {
 			$this->request->data = array('Tag' => array('Tag' => $this->request->params['named']['tag_id']));
 		}
 
-		//if (AuthComponent::user('role_id') != Role::ADMIN)
+		//if ($this->Auth->user('role_id') != Role::ADMIN)
 		{
-			$options['conditions'][] = array('Question.user_id' => AuthComponent::user('id'));
+			$options['conditions'][] = array('Question.user_id' => $this->Auth->user('id'));
 		}
 		$options['contain'][] = 'Tag';
 
@@ -221,7 +221,7 @@ class QuestionsController extends AppController {
 			$this->request->data = array('Tag' => array('Tag' => $this->request->params['named']['tag_id']));
 		}
 
-		$options['conditions'][] = array('Question.user_id' => AuthComponent::user('id'));
+		$options['conditions'][] = array('Question.user_id' => $this->Auth->user('id'));
 		$options['contain'][] = 'QuestionAnswer';
 		$options['contain'][] = 'Tag';
 
@@ -248,7 +248,7 @@ class QuestionsController extends AppController {
 			$this->request->data = array('Tag' => array('Tag' => $this->request->params['named']['tag_id']));
 		}
 
-		$options['conditions'][] = array('Question.user_id' => AuthComponent::user('id'));
+		$options['conditions'][] = array('Question.user_id' => $this->Auth->user('id'));
 		$options['contain'][] = 'QuestionAnswer';
 		$options['contain'][] = 'Tag';
 
@@ -269,7 +269,7 @@ class QuestionsController extends AppController {
 			$this->request->data = array('Tag' => array('Tag' => $this->request->params['named']['tag_id']));
 		}
 
-		$options['conditions'][] = array('Question.user_id' => AuthComponent::user('id'));
+		$options['conditions'][] = array('Question.user_id' => $this->Auth->user('id'));
 		$options['contain'][] = 'QuestionAnswer';
 		$options['contain'][] = 'Tag';
 
@@ -289,7 +289,7 @@ class QuestionsController extends AppController {
 			$this->request->data = array('Tag' => array('Tag' => $this->request->params['named']['tag_id']));
 		}
 
-		$options['conditions'][] = array('Question.user_id' => AuthComponent::user('id'));
+		$options['conditions'][] = array('Question.user_id' => $this->Auth->user('id'));
 		$options['contain'][] = 'QuestionAnswer';
 		$options['contain'][] = 'Tag';
 

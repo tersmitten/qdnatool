@@ -1,6 +1,7 @@
 <?php
 define('EXAM_UPLOAD_DIRECTORY', TMP . 'uploads' . DS);
 define('EXAM_REPORT_DIRECTORY', ROOT . DS . 'data' . DS . 'reports' . DS);
+App::uses('AuthComponent', 'Controller/Component');
 App::uses('Rserve', 'Lib');
 App::uses('ClassRegistry', 'Utility');
 App::uses('ExamFormat', 'Model');
@@ -16,13 +17,18 @@ App::uses('AppModel', 'Model');
  * @property ExamState $ExamState
  * @property Exam $Parent
  * @property Exam $Child
- *
  */
 class Exam extends AppModel {
 
+/**
+ * actsAs behaviors
+ *
+ * @var array
+ */
 	public $actsAs = array('I18n');
 
 	const UPLOAD_DIRECTORY = EXAM_UPLOAD_DIRECTORY;
+
 	const REPORT_DIRECTORY = EXAM_REPORT_DIRECTORY;
 
 /**
@@ -35,16 +41,14 @@ class Exam extends AppModel {
 			'notEmpty' => array(
 				'rule' => 'notEmpty',
 				'message' => 'This field cannot be left blank',
-				//'allowEmpty' => false,
-				//'required' => false,
-				//'last' => false, // Stop validation after this rule
-				//'on' => 'create', // Limit validation to 'create' or 'update' operations
+				'required' => 'create'
 			),
 		),
 		'exam_format_id' => array(
 			'notEmpty' => array(
 				'rule' => 'notEmpty',
 				'message' => 'This field cannot be left blank',
+				'required' => 'create',
 				'last' => true
 			),
 			'inList' => array(
@@ -104,13 +108,13 @@ class Exam extends AppModel {
 			)
 		),
 		'user_id' => array(
+			'notEmpty' => array(
+				'rule' => 'notEmpty',
+				'message' => 'This field cannot be left blank',
+				'required' => 'create'
+			),
 			'numeric' => array(
-				'rule' => array('numeric'),
-				//'message' => 'Your custom message here',
-				//'allowEmpty' => false,
-				//'required' => false,
-				//'last' => false, // Stop validation after this rule
-				//'on' => 'create', // Limit validation to 'create' or 'update' operations
+				'rule' => 'numeric'
 			)
 		),
 		'Item' => array(
@@ -124,8 +128,6 @@ class Exam extends AppModel {
 			)
 		)
 	);
-
-	//The Associations below have been created with all possible keys, those that are not needed can be removed
 
 /**
  * belongsTo associations

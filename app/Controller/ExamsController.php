@@ -12,7 +12,7 @@ class ExamsController extends AppController {
 	public $helpers = array('Number', 'Output');
 
 	public function blackhole($type) {
-		$this->Session->setFlash(__('Sorry, something went wrong. Please, try again.'), 'alert', array('plugin' => 'TwitterBootstrap', 'class' => 'alert-error'));
+		$this->setFlashError(__('Sorry, something went wrong. Please, try again.'));
 		return $this->redirect(array('action' => 'index'));
 	}
 
@@ -23,7 +23,7 @@ class ExamsController extends AppController {
  */
 	public function index() {
 		$conditions = array(
-			'Exam.user_id' => AuthComponent::user('id'),
+			'Exam.user_id' => $this->Auth->user('id'),
 			'Exam.parent_id' => null,
 			'Exam.deleted' => null
 		);
@@ -45,6 +45,7 @@ class ExamsController extends AppController {
  * @throws NotFoundException
  * @param string $id
  * @return void
+ * @todo throw exception when exam doesn't belong to current user
  */
 	public function view($id = null) {
 		$this->Exam->id = $id;
@@ -55,7 +56,7 @@ class ExamsController extends AppController {
 			'first', array(
 				'conditions' => array(
 					'Exam.id' => $id,
-					'Exam.user_id' => AuthComponent::user('id')
+					'Exam.user_id' => $this->Auth->user('id')
 				),
 				'contain' => array(
 					'Item' => 'AnswerOption',
@@ -74,10 +75,10 @@ class ExamsController extends AppController {
 	public function add() {
 		if ($this->request->is('post')) {
 			if ($this->Exam->add($this->request->data)) {
-				$this->Session->setFlash(__('The exam has been saved'), 'alert', array('plugin' => 'TwitterBootstrap', 'class' => 'alert-success'));
+				$this->setFlashSuccess(__('The exam has been saved'));
 				return $this->redirect(array('action' => 'index'));
 			} else {
-				$this->Session->setFlash(__('The exam could not be saved. Please, try again.'), 'alert', array('plugin' => 'TwitterBootstrap', 'class' => 'alert-error'));
+				$this->setFlashError(__('The exam could not be saved. Please, try again.'));
 			}
 		}
 		$examFormats = $this->Exam->ExamFormat->find('list');
@@ -101,21 +102,11 @@ class ExamsController extends AppController {
 			throw new NotFoundException(__('Invalid exam'));
 		}
 		if ($this->Exam->remove($id)) {
-			$this->Session->setFlash(__('Exam deleted'), 'alert', array('plugin' => 'TwitterBootstrap', 'class' => 'alert-success'));
+			$this->setFlashSuccess(__('Exam deleted'));
 			return $this->redirect(array('action' => 'index'));
 		}
-		$this->Session->setFlash(__('Exam was not deleted'), 'alert', array('action' => 'index'), array('plugin' => 'TwitterBootstrap', 'class' => 'alert-error'));
+		$this->setFlashError(__('Exam was not deleted'));
 		return $this->redirect(array('action' => 'index'));
-	}
-
-/**
- * delete method
- *
- * @param string $id
- * @return void
- */
-	public function analyse($id = null) {
-		$this->Exam->analyse($id);
 	}
 
 /**
@@ -143,31 +134,7 @@ class ExamsController extends AppController {
 	}
 
 /**
- * generate_report method
- *
- * @param string $id
- * @return void
- * @throws MethodNotAllowedException
- * @throws NotFoundException
- */
-	public function generate_report($id = null) {
-		if (!$this->request->is('post')) {
-			throw new MethodNotAllowedException();
-		}
-		$this->Exam->id = $id;
-		if (!$this->Exam->exists()) {
-			throw new NotFoundException(__('Invalid exam'));
-		}
-		if ($this->Exam->scheduleReport($id)) {
-			$this->Session->setFlash(__('Exam is scheduled to report'), 'alert', array('plugin' => 'TwitterBootstrap', 'class' => 'alert-success'));
-			return $this->redirect(array('action' => 'index'));
-		}
-		$this->Session->setFlash(__('Exam was not scheduled to report'), 'alert', array('action' => 'index'), array('plugin' => 'TwitterBootstrap', 'class' => 'alert-error'));
-		return $this->redirect(array('action' => 'index'));
-	}
-
-/**
- * generate_report method
+ * report method
  *
  * @param string $id
  * @return void
@@ -215,10 +182,10 @@ class ExamsController extends AppController {
 			$this->request->data = array('Exam' => array('parent_id' => $id));
 		} else {
 			if ($id = $this->Exam->scheduleReanalyse($this->request->data)) {
-				$this->Session->setFlash(__('The exam has been scheduled to reanalyse'), 'alert', array('plugin' => 'TwitterBootstrap', 'class' => 'alert-success'));
+				$this->setFlashSuccess(__('The exam has been scheduled to reanalyse'));
 				return $this->redirect(array('action' => 'index'));
 			} else {
-				$this->Session->setFlash(__('The exam could not be reanalysed. Please, try again.'), 'alert', array('plugin' => 'TwitterBootstrap', 'class' => 'alert-error'));
+				$this->setFlashError(__('The exam could not be reanalysed. Please, try again.'));
 			}
 		}
 
